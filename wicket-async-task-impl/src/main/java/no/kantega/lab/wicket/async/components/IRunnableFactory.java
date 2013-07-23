@@ -1,4 +1,4 @@
-package no.kantega.lab.wicket.async.gui;
+package no.kantega.lab.wicket.async.components;
 
 import java.io.Serializable;
 

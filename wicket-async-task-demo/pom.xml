@@ -35,13 +35,6 @@
         <resources>
             <resource>
                 <filtering>false</filtering>
-                <directory>src/main/resources</directory>
-                <excludes>
-                    <exclude>maven</exclude>
-                </excludes>
-            </resource>
-            <resource>
-                <filtering>false</filtering>
                 <directory>src/main/java</directory>
                 <includes>
                     <include>**</include>

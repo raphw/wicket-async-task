@@ -36,6 +36,9 @@ public class GenericTask implements IProgressObservableRunnable {
     @Override
     public void run() {
 
+        setProgress(0d);
+        setProgressMessage(null);
+
         double progressIncrement = 1d / steps;
 
         try {
@@ -43,6 +46,7 @@ public class GenericTask implements IProgressObservableRunnable {
             for (int i = 0; i < steps; i++) {
                 Thread.sleep(waitingTime);
                 setProgress(this.progress + progressIncrement);
+                setProgressMessage(String.format("Step %d of %d", i + 1, steps));
                 System.out.printf("Background task: %.2f (%d/%d)%n", progress, i + 1, steps);
             }
 

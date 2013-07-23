@@ -2,16 +2,20 @@
 <html xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
 <head>
     <meta charset="utf-8"/>
-    <title>Async progress bar demo</title>
-    <link rel="stylesheet" href="css/bootstrap.css" type="text/css" media="screen" title="Stylesheet"/>
+    <title>Async task demo</title>
+    <link rel="stylesheet" href="/css/bootstrap.css" type="text/css" media="screen" title="Stylesheet"/>
 </head>
 <body style="padding: 20px;">
 
 <form wicket:id="form">
 
-    <input type="button" wicket:id="button"/>
+    <input type="button" wicket:id="button" style="float: left; width: 130px;"/>
+
+    <div wicket:id="bar" style="width: 200px; float: left; margin-left: 30px;"></div>
 
 </form>
+
+<br style="clear: both;"/>
 
 </body>
 </html>
