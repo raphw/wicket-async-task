@@ -29,6 +29,11 @@
             <artifactId>slf4j-simple</artifactId>
             <version>${version.slf4j}</version>
         </dependency>
+        <dependency>
+            <groupId>org.wicketstuff</groupId>
+            <artifactId>wicketstuff-core</artifactId>
+            <version>6.9.0</version>
+        </dependency>
     </dependencies>
 
     <build>

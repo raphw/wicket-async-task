@@ -106,9 +106,11 @@ public class ProgressButton extends AjaxFallbackButton {
 
         if (canStart() || canRestart()) {
             taskModel.submit(runnableFactory.getRunnable());
+            onTaskStart(taskModel);
             System.out.println(" -> New task submitted");
         } else if (canInterrupt()) {
             taskModel.cancel();
+            onTaskCancel(taskModel);
             System.out.println(" -> Task interrupted");
         } else {
             System.out.println(" -> Ignored button press");
@@ -125,6 +127,11 @@ public class ProgressButton extends AjaxFallbackButton {
         if (!taskModel.isRunning()) {
             if (getBehaviors(RefreshBehavior.class).size() > 0) {
                 refreshBehavior.stop(target);
+            }
+            if (taskModel.isFailed()) {
+                onTaskError(taskModel);
+            } else {
+                onTaskSuccess(taskModel);
             }
         } else if (getBehaviors(RefreshBehavior.class).size() == 0) {
             add(refreshBehavior);
@@ -253,5 +260,21 @@ public class ProgressButton extends AjaxFallbackButton {
 
     public void removeRefreshDependant(Component refreshDependant) {
         refreshDependants.remove(refreshDependant);
+    }
+
+    protected void onTaskStart(AbstractTaskModel taskModel) {
+
+    }
+
+    protected void onTaskSuccess(AbstractTaskModel taskModel) {
+
+    }
+
+    protected void onTaskCancel(AbstractTaskModel taskModel) {
+
+    }
+
+    protected void onTaskError(AbstractTaskModel taskModel) {
+
     }
 }

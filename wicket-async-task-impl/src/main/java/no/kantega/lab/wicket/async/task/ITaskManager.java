@@ -6,7 +6,9 @@ public interface ITaskManager {
 
     AbstractTaskModel makeModel(long lifeTime, TimeUnit unit);
 
-    AbstractTaskModel makeOrGetModel(String id, long lifeTime, TimeUnit unit);
+    AbstractTaskModel makeOrRenewModel(String id, long lifeTime, TimeUnit unit);
 
     AbstractTaskModel getModelOrFail(String id);
+
+    void cleanUp();
 }
