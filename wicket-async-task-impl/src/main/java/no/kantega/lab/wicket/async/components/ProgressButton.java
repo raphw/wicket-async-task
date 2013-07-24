@@ -10,6 +10,7 @@ import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.util.time.Duration;
 
 import java.lang.reflect.Method;
@@ -20,8 +21,8 @@ import java.util.Map;
 
 public class ProgressButton extends AjaxFallbackButton {
 
-    private final Map<TaskState, IModel<String>> taskStateTextMessages;
-    private final Map<TaskState, IModel<String>> taskStateCssClasses;
+    private final Map<StateDescription, IModel<String>> stateTextModels;
+    private final Map<StateDescription, IModel<String>> stateCssClasses;
 
     private final Collection<Component> refreshDependants;
 
@@ -52,37 +53,23 @@ public class ProgressButton extends AjaxFallbackButton {
 
         this.refreshBehavior = new RefreshBehavior(duration);
 
-        this.taskStateTextMessages = new HashMap<TaskState, IModel<String>>();
-        this.setModel(new TaskStateDispatcherModel<String>(getDefaultTextModel(model), taskStateTextMessages));
+        this.stateTextModels = new HashMap<StateDescription, IModel<String>>();
+        this.setModel(new StateDispatcherModel<String>(getDefaultTextModel(model), stateTextModels));
 
-        this.taskStateCssClasses = new HashMap<TaskState, IModel<String>>();
-        this.add(new AttributeAppender("class", new TaskStateDispatcherModel<String>(getDefaultCssClassModel(), taskStateCssClasses)));
+        this.stateCssClasses = new HashMap<StateDescription, IModel<String>>();
+        this.add(new AttributeAppender("class", new StateDispatcherModel<String>(new Model<String>(), stateCssClasses), " "));
 
         this.setOutputMarkupId(true);
 
-        activateRefreshIfRequired(null);
+        activateRefresh(null);
     }
 
     private IModel<String> getDefaultTextModel(IModel<String> userModel) {
         if (userModel == null) {
-            return new AbstractReadOnlyModel<String>() {
-                @Override
-                public String getObject() {
-                    return getMarkupAttributes().getString("value", "");
-                }
-            };
+            return new Model<String>();
         } else {
             return userModel;
         }
-    }
-
-    private IModel<String> getDefaultCssClassModel() {
-        return new AbstractReadOnlyModel<String>() {
-            @Override
-            public String getObject() {
-                return getMarkupAttributes().getString("class", "");
-            }
-        };
     }
 
     protected AbstractTaskModel getTaskModel() {
@@ -101,15 +88,15 @@ public class ProgressButton extends AjaxFallbackButton {
         return true;
     }
 
-    private boolean canStart() {
+    boolean canStart() {
         return runnableFactory != null && isAllowStart() && !taskModel.isSubmitted() && !taskModel.isRunning();
     }
 
-    private boolean canRestart() {
+    boolean canRestart() {
         return runnableFactory != null && isAllowRestart() && taskModel.isSubmitted() && !taskModel.isRunning();
     }
 
-    private boolean canInterrupt() {
+    boolean canInterrupt() {
         return isAllowInterrupt() && !taskModel.isCancelled() && taskModel.isRunning();
     }
 
@@ -119,21 +106,27 @@ public class ProgressButton extends AjaxFallbackButton {
 
         if (canStart() || canRestart()) {
             taskModel.submit(runnableFactory.getRunnable());
+            System.out.println(" -> New task submitted");
         } else if (canInterrupt()) {
             taskModel.cancel();
+            System.out.println(" -> Task interrupted");
+        } else {
+            System.out.println(" -> Ignored button press");
+            return;
         }
 
         if (target != null) {
-            target.add(this);
-            activateRefreshIfRequired(target);
+            renderAll(target);
+            activateRefresh(target);
         }
     }
 
-    private void activateRefreshIfRequired(AjaxRequestTarget target) {
+    private void activateRefresh(AjaxRequestTarget target) {
         if (!taskModel.isRunning()) {
-            return;
-        }
-        if (getBehaviors(RefreshBehavior.class).size() == 0) {
+            if (getBehaviors(RefreshBehavior.class).size() > 0) {
+                refreshBehavior.stop(target);
+            }
+        } else if (getBehaviors(RefreshBehavior.class).size() == 0) {
             add(refreshBehavior);
         } else {
             refreshBehavior.restart(target);
@@ -144,6 +137,10 @@ public class ProgressButton extends AjaxFallbackButton {
         if (!taskModel.isRunning()) {
             refreshBehavior.stop(target);
         }
+        renderAll(target);
+    }
+
+    private void renderAll(AjaxRequestTarget target) {
         target.add(this);
         for (Component c : refreshDependants) {
             target.add(c);
@@ -179,23 +176,55 @@ public class ProgressButton extends AjaxFallbackButton {
         }
     }
 
-    public void registerTaskStateMessageModel(TaskState state, IModel<String> textModel) {
-        taskStateTextMessages.put(state, textModel);
+    public void registerMessageModel(IModel<String> textModel, TaskState taskState, InteractionState interactionState) {
+        stateTextModels.put(new StateDescription(taskState, interactionState), textModel);
     }
 
-    public void registerTaskStateCssClassModel(TaskState state, IModel<String> cssClassModel) {
-        taskStateCssClasses.put(state, cssClassModel);
+    public void registerMessageModel(IModel<String> textModel, TaskState... taskStates) {
+        for (TaskState taskState : taskStates) {
+            for (InteractionState interactionState : InteractionState.values()) {
+                registerMessageModel(textModel, taskState, interactionState);
+            }
+        }
     }
 
-    class TaskStateDispatcherModel<T> extends AbstractReadOnlyModel<T> {
+    public void registerMessageModel(IModel<String> textModel, InteractionState... interactionStates) {
+        for (InteractionState interactionState : interactionStates) {
+            for (TaskState taskState : TaskState.values()) {
+                registerMessageModel(textModel, taskState, interactionState);
+            }
+        }
+    }
+
+    public void registerCssClassModel(IModel<String> textModel, TaskState taskState, InteractionState interactionState) {
+        stateCssClasses.put(new StateDescription(taskState, interactionState), textModel);
+    }
+
+    public void registerCssClassModel(IModel<String> textModel, TaskState... taskStates) {
+        for (TaskState taskState : taskStates) {
+            for (InteractionState interactionState : InteractionState.values()) {
+                registerCssClassModel(textModel, taskState, interactionState);
+            }
+        }
+    }
+
+    public void registerCssClassModel(IModel<String> textModel, InteractionState... interactionStates) {
+        for (InteractionState interactionState : interactionStates) {
+            for (TaskState taskState : TaskState.values()) {
+                registerCssClassModel(textModel, taskState, interactionState);
+            }
+        }
+    }
+
+    class StateDispatcherModel<T> extends AbstractReadOnlyModel<T> {
 
         private final IModel<T> defaultValue;
 
-        private final Map<TaskState, IModel<T>> taskStateValues;
+        private final Map<StateDescription, IModel<T>> stateValues;
 
-        TaskStateDispatcherModel(IModel<T> defaultValue, Map<TaskState, IModel<T>> taskStateValues) {
+        StateDispatcherModel(IModel<T> defaultValue, Map<StateDescription, IModel<T>> taskStateValues) {
             this.defaultValue = defaultValue;
-            this.taskStateValues = taskStateValues;
+            this.stateValues = taskStateValues;
         }
 
         @Override
@@ -209,17 +238,12 @@ public class ProgressButton extends AjaxFallbackButton {
         }
 
         private IModel<T> getActualModel() {
-            if (canStart()) {
-                return taskStateValues.get(TaskState.START);
-            } else if (canRestart()) {
-                return taskStateValues.get(TaskState.RESTART);
-            } else if (canInterrupt()) {
-                return taskStateValues.get(TaskState.CANCEL);
-            } else if (taskModel.isFailed()) {
-                return taskStateValues.get(TaskState.ERROR);
-            } else {
-                return taskStateValues.get(TaskState.RUNNING);
-            }
+            return stateValues.get(
+                    new StateDescription(
+                            TaskState.findRunningState(taskModel),
+                            InteractionState.findInteractionState(ProgressButton.this)
+                    )
+            );
         }
     }
 

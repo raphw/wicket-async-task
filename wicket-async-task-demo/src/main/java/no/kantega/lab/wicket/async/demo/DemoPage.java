@@ -1,9 +1,6 @@
 package no.kantega.lab.wicket.async.demo;
 
-import no.kantega.lab.wicket.async.components.IRunnableFactory;
-import no.kantega.lab.wicket.async.components.ProgressBar;
-import no.kantega.lab.wicket.async.components.ProgressButton;
-import no.kantega.lab.wicket.async.components.TaskState;
+import no.kantega.lab.wicket.async.components.*;
 import no.kantega.lab.wicket.async.task.AbstractTaskModel;
 import no.kantega.lab.wicket.async.task.DefaultTaskManager;
 import org.apache.wicket.markup.html.WebPage;
@@ -26,18 +23,22 @@ public class DemoPage extends WebPage implements IRunnableFactory {
         // Create a progress button.
         ProgressButton progressButton = new ProgressButton("button", form, taskModel, this, Duration.milliseconds(500L));
 
-        progressButton.registerTaskStateMessageModel(TaskState.START, Model.of("Start"));
-        progressButton.registerTaskStateMessageModel(TaskState.RESTART, Model.of("Restart"));
-        progressButton.registerTaskStateMessageModel(TaskState.CANCEL, Model.of("Cancel"));
-        progressButton.registerTaskStateMessageModel(TaskState.RUNNING, Model.of("Running..."));
+        progressButton.registerMessageModel(Model.of("Start"), InteractionState.STARTABLE, InteractionState.RESTARTABLE);
+        progressButton.registerMessageModel(Model.of("Cancel"), InteractionState.CANCELABLE);
+        progressButton.registerMessageModel(Model.of("Running..."), InteractionState.NON_INTERACTIVE);
 
-        progressButton.registerTaskStateCssClassModel(TaskState.START, Model.of("btn btn-primary"));
-        progressButton.registerTaskStateCssClassModel(TaskState.RESTART, Model.of("btn btn-success"));
-        progressButton.registerTaskStateCssClassModel(TaskState.CANCEL, Model.of("btn btn-warning"));
-        progressButton.registerTaskStateCssClassModel(TaskState.RUNNING, Model.of("btn"));
+        progressButton.registerCssClassModel(Model.of("btn-primary"), TaskState.PLAIN_NON_RUNNING, TaskState.CANCELED_NON_RUNNING);
+        progressButton.registerCssClassModel(Model.of("btn-warning"), TaskState.PLAIN_RUNNING, TaskState.CANCELED_RUNNING);
+        progressButton.registerCssClassModel(Model.of("btn-danger"), TaskState.ERROR_NON_RUNNING);
 
         // Create a progress bar
         ProgressBar progressBar = new ProgressBar("bar", progressButton);
+
+        progressBar.registerCssClassModel(Model.of("progress-info progress-striped active"), TaskState.PLAIN_RUNNING);
+        progressBar.registerCssClassModel(Model.of("progress-warning progress-striped active"), TaskState.CANCELED_RUNNING);
+        progressBar.registerCssClassModel(Model.of("progress-info progress-striped"), TaskState.PLAIN_NON_RUNNING);
+        progressBar.registerCssClassModel(Model.of("progress-warning  progress-striped"), TaskState.CANCELED_NON_RUNNING);
+        progressBar.registerCssClassModel(Model.of("progress-danger progress-striped"), TaskState.ERROR_NON_RUNNING);
 
         // Add components to page
         add(form);
@@ -47,6 +48,6 @@ public class DemoPage extends WebPage implements IRunnableFactory {
 
     @Override
     public Runnable getRunnable() {
-        return new GenericTask(10, 150L);
+        return new GenericTask(30, 150L);
     }
 }
