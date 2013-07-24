@@ -10,14 +10,21 @@ public abstract class DefaultTaskManager implements ITaskManager {
     private static final DefaultTaskManager INSTANCE = new DefaultTaskManager() {
         @Override
         protected AbstractTaskModel makeTaskModel(final String id) {
-            return new AbstractTaskModel(id) {
-                @Override
-                protected ITaskManagerHook load() {
-                    return INSTANCE.findHookForId(id);
-                }
-            };
+            return new SingletonTaskManagerTaskModel(id);
         }
     };
+
+    private static class SingletonTaskManagerTaskModel extends AbstractTaskModel {
+
+        private SingletonTaskManagerTaskModel(String id) {
+            super(id);
+        }
+
+        @Override
+        protected ITaskManagerHook load() {
+            return INSTANCE.findHookForId(getId());
+        }
+    }
 
     public static DefaultTaskManager getInstance() {
         return INSTANCE;

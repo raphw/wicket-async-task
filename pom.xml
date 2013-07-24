@@ -62,6 +62,12 @@
             <version>${version.wicket}</version>
         </dependency>
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${version.slf4j}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>${version.testng}</version>

@@ -6,10 +6,17 @@ public class GenericTask implements IProgressObservableRunnable {
 
     private final int steps;
     private final long waitingTime;
+    private final RuntimeException e;
+
 
     public GenericTask(int steps, long waitingTime) {
+        this(steps, waitingTime, null);
+    }
+
+    public GenericTask(int steps, long waitingTime, RuntimeException e) {
         this.steps = steps;
         this.waitingTime = waitingTime;
+        this.e = e;
     }
 
     private double progress;
@@ -48,6 +55,10 @@ public class GenericTask implements IProgressObservableRunnable {
                 setProgress(this.progress + progressIncrement);
                 setProgressMessage(String.format("Step %d of %d", i + 1, steps));
                 System.out.printf("Background task: %.2f (%d/%d)%n", progress, i + 1, steps);
+            }
+
+            if (e != null) {
+                throw e;
             }
 
         } catch (InterruptedException e) {

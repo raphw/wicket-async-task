@@ -40,6 +40,7 @@ public class DefaultTaskManagerTest {
         Thread.sleep((long) (removalMilliseconds * sleepMultiplier));
 
         // Since the implementation is built on top of weak references, GC must be triggered manually
+        // Depending of the JVM implementation, this test might unfortunately fail
         taskManager.cleanUp();
         System.gc();
 
@@ -61,5 +62,24 @@ public class DefaultTaskManagerTest {
         taskManager.cleanUp();
 
         taskManager.getModelOrFail(testId);
+    }
+
+    @Test
+    public void testExecution() throws Exception {
+
+        final boolean[] val = new boolean[1];
+
+        AbstractTaskModel taskModel = taskManager.makeModel(1L, TimeUnit.MINUTES);
+        taskModel.submit(new Runnable() {
+            @Override
+            public void run() {
+                val[0] = true;
+            }
+        });
+
+        // This is assumed to be efficient, even for slow machines
+        Thread.sleep(500L);
+
+        assertTrue(val[0]);
     }
 }

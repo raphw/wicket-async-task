@@ -8,8 +8,6 @@ public abstract class AbstractTaskModel extends LoadableDetachableModel<ITaskMan
 
     private final String id;
 
-    private ExecutionException executionException;
-
     protected AbstractTaskModel(String id) {
         this.id = id;
     }
@@ -49,8 +47,7 @@ public abstract class AbstractTaskModel extends LoadableDetachableModel<ITaskMan
     }
 
     public boolean isFailed() {
-        checkForExecutionError();
-        return executionException != null;
+        return evaluateExecutionError() != null;
     }
 
     public boolean isCancelled() {
@@ -58,12 +55,10 @@ public abstract class AbstractTaskModel extends LoadableDetachableModel<ITaskMan
     }
 
     public Throwable getExecutionError() {
-        checkForExecutionError();
-        return executionException.getCause();
+        return evaluateExecutionError();
     }
 
     public void submit(Runnable runnable) {
-        executionException = null;
         getObject().submit(runnable, true);
     }
 
@@ -71,19 +66,21 @@ public abstract class AbstractTaskModel extends LoadableDetachableModel<ITaskMan
         getFuture().cancel(true);
     }
 
-    private void checkForExecutionError() {
+    private Throwable evaluateExecutionError() {
         try {
-            getFuture().get(1L, TimeUnit.NANOSECONDS);
+            getFuture().get(1L, TimeUnit.MICROSECONDS);
+            return null;
         } catch (InterruptedException e) {
-            /* this can only happen if the server's current dispatcher
-            thread gets interrupted and this should not happen */
-            throw new RuntimeException("Thread was interrupted", e);
+            /* this should never happen since this call
+            should only occur non-blocking */
+            throw new AssertionError(e);
         } catch (ExecutionException e) {
-            executionException = e;
-        } catch (TimeoutException e) {
-            /* do nothing */
+            return e.getCause();
         } catch (CancellationException e) {
-            /* do nothing */
+            return null;
+        } catch (TimeoutException e) {
+            /* Task is still running */
+            return null;
         }
     }
 

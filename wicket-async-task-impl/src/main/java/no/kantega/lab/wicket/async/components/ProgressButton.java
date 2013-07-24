@@ -60,8 +60,6 @@ public class ProgressButton extends AjaxFallbackButton {
         this.add(new AttributeAppender("class", new StateDispatcherModel<String>(new Model<String>(), stateCssClasses), " "));
 
         this.setOutputMarkupId(true);
-
-        activateRefresh(null);
     }
 
     private IModel<String> getDefaultTextModel(IModel<String> userModel) {
@@ -107,31 +105,24 @@ public class ProgressButton extends AjaxFallbackButton {
         if (canStart() || canRestart()) {
             taskModel.submit(runnableFactory.getRunnable());
             onTaskStart(taskModel);
-            System.out.println(" -> New task submitted");
         } else if (canInterrupt()) {
             taskModel.cancel();
             onTaskCancel(taskModel);
-            System.out.println(" -> Task interrupted");
         } else {
-            System.out.println(" -> Ignored button press");
             return;
         }
 
         if (target != null) {
-            renderAll(target);
             activateRefresh(target);
+            renderAll(target);
         }
+        concludeIfApplicable(target);
     }
 
     private void activateRefresh(AjaxRequestTarget target) {
         if (!taskModel.isRunning()) {
             if (getBehaviors(RefreshBehavior.class).size() > 0) {
                 refreshBehavior.stop(target);
-            }
-            if (taskModel.isFailed()) {
-                onTaskError(taskModel);
-            } else {
-                onTaskSuccess(taskModel);
             }
         } else if (getBehaviors(RefreshBehavior.class).size() == 0) {
             add(refreshBehavior);
@@ -141,10 +132,21 @@ public class ProgressButton extends AjaxFallbackButton {
     }
 
     protected void refresh(AjaxRequestTarget target) {
-        if (!taskModel.isRunning()) {
-            refreshBehavior.stop(target);
-        }
+        concludeIfApplicable(target);
         renderAll(target);
+    }
+
+    private void concludeIfApplicable(AjaxRequestTarget target) {
+        if (!taskModel.isRunning()) {
+            if (target != null) {
+                refreshBehavior.stop(target);
+            }
+            if (taskModel.isFailed()) {
+                onTaskError(taskModel);
+            } else if (!taskModel.isCancelled()) {
+                onTaskSuccess(taskModel);
+            }
+        }
     }
 
     private void renderAll(AjaxRequestTarget target) {
@@ -167,7 +169,6 @@ public class ProgressButton extends AjaxFallbackButton {
         @Override
         protected void onTimer(AjaxRequestTarget target) {
             refresh(target);
-            System.out.println("-> Refresh");
         }
 
         @Override
@@ -263,15 +264,12 @@ public class ProgressButton extends AjaxFallbackButton {
     }
 
     protected void onTaskStart(AbstractTaskModel taskModel) {
-
     }
 
     protected void onTaskSuccess(AbstractTaskModel taskModel) {
-
     }
 
     protected void onTaskCancel(AbstractTaskModel taskModel) {
-
     }
 
     protected void onTaskError(AbstractTaskModel taskModel) {

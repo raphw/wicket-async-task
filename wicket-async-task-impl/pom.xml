@@ -18,6 +18,7 @@
 
     <properties>
         <version.guava>14.0.1</version.guava>
+        <version.glassfish>3.0</version.glassfish>
     </properties>
 
     <dependencies>
@@ -31,7 +32,20 @@
             <artifactId>guava</artifactId>
             <version>${version.guava}</version>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.servlet</artifactId>
+            <version>${version.glassfish}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>java.net</id>
+            <url>http://download.java.net/maven/2</url>
+        </repository>
+    </repositories>
 
     <build>
         <resources>
@@ -46,6 +60,18 @@
                 </excludes>
             </resource>
         </resources>
+        <testResources>
+            <testResource>
+                <filtering>false</filtering>
+                <directory>src/test/java</directory>
+                <includes>
+                    <include>**</include>
+                </includes>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+            </testResource>
+        </testResources>
     </build>
 
 </project>
