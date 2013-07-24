@@ -19,6 +19,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+/**
+ * A progress button which allows to control a {@link Runnable}. Each such button will refresh itself as given by
+ * by the {@link Duration} with which it was constructed. It represents a runnable by a {@link AbstractTaskModel}.
+ * In order to create tasks, the button needs to be provided a {@link IRunnableFactory}.
+ */
 public class ProgressButton extends AjaxFallbackButton {
 
     private final Map<StateDescription, IModel<String>> stateTextModels;
@@ -74,15 +79,30 @@ public class ProgressButton extends AjaxFallbackButton {
         return taskModel;
     }
 
+    /**
+     * This method can be overridden to implement a custom behavior for starting tasks.
+     *
+     * @return {@code true} if the button is allowed to start a task.
+     */
     protected boolean isAllowStart() {
         return true;
     }
 
-    protected boolean isAllowInterrupt() {
+    /**
+     * This method can be overridden to implement a custom behavior for restarting tasks.
+     *
+     * @return {@code true} if the button is allowed to restart a task.
+     */
+    protected boolean isAllowRestart() {
         return true;
     }
 
-    protected boolean isAllowRestart() {
+    /**
+     * This method can be overridden to implement a custom behavior for interrupt tasks.
+     *
+     * @return {@code true} if the button is allowed to interrupt a running task.
+     */
+    protected boolean isAllowInterrupt() {
         return true;
     }
 
@@ -131,6 +151,11 @@ public class ProgressButton extends AjaxFallbackButton {
         }
     }
 
+    /**
+     * Overriding allows a custom refresh behavior. Should call super implementation.
+     *
+     * @param target The Ajax request target.
+     */
     protected void refresh(AjaxRequestTarget target) {
         concludeIfApplicable(target);
         renderAll(target);
@@ -184,10 +209,24 @@ public class ProgressButton extends AjaxFallbackButton {
         }
     }
 
+    /**
+     * Adds a text model for the button which will be appended only if {@code taskState} and {@code interactionState} apply.
+     *
+     * @param textModel        The model to be appended.
+     * @param taskState        The relevant task state.
+     * @param interactionState The relevant interaction state.
+     */
     public void registerMessageModel(IModel<String> textModel, TaskState taskState, InteractionState interactionState) {
         stateTextModels.put(new StateDescription(taskState, interactionState), textModel);
     }
 
+    /**
+     * Adds a text model for the button which will be appended if any of the {@code taskStates} apply, disregarding any
+     * possible interaction state.
+     *
+     * @param textModel  The model to be appended.
+     * @param taskStates All relevant task states.
+     */
     public void registerMessageModel(IModel<String> textModel, TaskState... taskStates) {
         for (TaskState taskState : taskStates) {
             for (InteractionState interactionState : InteractionState.values()) {
@@ -196,6 +235,13 @@ public class ProgressButton extends AjaxFallbackButton {
         }
     }
 
+    /**
+     * Adds a text model for the button which will be appended if any of the {@code interactionStates} apply, disregarding any
+     * possible task state.
+     *
+     * @param textModel         The model to be appended.
+     * @param interactionStates All relevant interaction states.
+     */
     public void registerMessageModel(IModel<String> textModel, InteractionState... interactionStates) {
         for (InteractionState interactionState : interactionStates) {
             for (TaskState taskState : TaskState.values()) {
@@ -204,10 +250,24 @@ public class ProgressButton extends AjaxFallbackButton {
         }
     }
 
+    /**
+     * Adds a model for a css class which will be appended only if {@code taskState} and {@code interactionState} apply.
+     *
+     * @param textModel        The model to be appended.
+     * @param taskState        The relevant task state.
+     * @param interactionState The relevant interaction state.
+     */
     public void registerCssClassModel(IModel<String> textModel, TaskState taskState, InteractionState interactionState) {
         stateCssClasses.put(new StateDescription(taskState, interactionState), textModel);
     }
 
+    /**
+     * Adds a model for a css class which will be appended if any of the {@code taskStates} apply, disregarding any
+     * possible interaction state.
+     *
+     * @param textModel  The model to be appended.
+     * @param taskStates All relevant task states.
+     */
     public void registerCssClassModel(IModel<String> textModel, TaskState... taskStates) {
         for (TaskState taskState : taskStates) {
             for (InteractionState interactionState : InteractionState.values()) {
@@ -216,6 +276,13 @@ public class ProgressButton extends AjaxFallbackButton {
         }
     }
 
+    /**
+     * Adds a model for a css class which will be appended if any of the {@code interactionStates} apply, disregarding any
+     * possible task state.
+     *
+     * @param textModel         The model to be appended.
+     * @param interactionStates All relevant interaction states.
+     */
     public void registerCssClassModel(IModel<String> textModel, InteractionState... interactionStates) {
         for (InteractionState interactionState : interactionStates) {
             for (TaskState taskState : TaskState.values()) {
@@ -255,23 +322,53 @@ public class ProgressButton extends AjaxFallbackButton {
         }
     }
 
+    /**
+     * Allows to add a component which is rerendered every time the button is rerendered.
+     *
+     * @param refreshDependant The dependant component.
+     */
     public void addRefreshDependant(Component refreshDependant) {
         refreshDependants.add(refreshDependant);
     }
 
+    /**
+     * Allows to remove a component which was rerendered every time the button was rerendered.
+     *
+     * @param refreshDependant The dependant component.
+     */
     public void removeRefreshDependant(Component refreshDependant) {
         refreshDependants.remove(refreshDependant);
     }
 
+    /**
+     * Override to trigger a custom action whenever a task is started.
+     * @param taskModel The model of this task.
+     */
     protected void onTaskStart(AbstractTaskModel taskModel) {
     }
 
+    /**
+     * Override to trigger a custom action whenever a task succeeded.
+     * <p/>
+     * <b>Note:</b> This trigger is only called if Ajax is enabled at the client.
+     * @param taskModel The model of this task.
+     */
     protected void onTaskSuccess(AbstractTaskModel taskModel) {
     }
 
+    /**
+     * Override to trigger a custom action whenever a task was canceled.
+     * @param taskModel The model of this task.
+     */
     protected void onTaskCancel(AbstractTaskModel taskModel) {
     }
 
+    /**
+     * Override to trigger a custom action whenever an error is occured.
+     * <p/>
+     * <b>Note:</b> This trigger is only called if Ajax is enabled at the client.
+     * @param taskModel The model of this task.
+     */
     protected void onTaskError(AbstractTaskModel taskModel) {
 
     }

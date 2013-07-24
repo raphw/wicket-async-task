@@ -13,6 +13,9 @@ import org.apache.wicket.model.Model;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This component renders a progress bar to an existent task which is controlled by a progress button.
+ */
 public class ProgressBar extends Panel {
 
     private final ProgressButton progressButton;
@@ -51,10 +54,21 @@ public class ProgressBar extends Panel {
         return new WebMarkupContainer(id);
     }
 
+    /**
+     * Determines if the task progress in percentage is showed within the bar.
+     *
+     * @return {@code true} if the number should be shown.
+     */
     protected boolean isShowPercentage() {
         return true;
     }
 
+    /**
+     * Determines the default width of the progress bar when there is no information available.
+     *
+     * @return The default width. Should be between {@code 0} and {@code 1}. Values outside this interval will
+     *         be trucated.
+     */
     protected double getDefaultWidth() {
         return 0d;
     }
@@ -90,10 +104,24 @@ public class ProgressBar extends Panel {
         return (int) Math.round(Math.max(Math.min(width, 1d), 0d) * 100d);
     }
 
+    /**
+     * Adds a model for a css class which will be appended only if {@code taskState} and {@code interactionState} apply.
+     *
+     * @param textModel        The model to be appended.
+     * @param taskState        The relevant task state.
+     * @param interactionState The relevant interaction state.
+     */
     public void registerCssClassModel(IModel<String> textModel, TaskState taskState, InteractionState interactionState) {
         stateCssClasses.put(new StateDescription(taskState, interactionState), textModel);
     }
 
+    /**
+     * Adds a model for a css class which will be appended if any of the {@code taskStates} apply, disregarding any
+     * possible interaction state.
+     *
+     * @param textModel  The model to be appended.
+     * @param taskStates All relevant task states.
+     */
     public void registerCssClassModel(IModel<String> textModel, TaskState... taskStates) {
         for (TaskState taskState : taskStates) {
             for (InteractionState interactionState : InteractionState.values()) {
@@ -102,6 +130,13 @@ public class ProgressBar extends Panel {
         }
     }
 
+    /**
+     * Adds a model for a css class which will be appended if any of the {@code interactionStates} apply, disregarding any
+     * possible task state.
+     *
+     * @param textModel         The model to be appended.
+     * @param interactionStates All relevant interaction states.
+     */
     public void registerCssClassModel(IModel<String> textModel, InteractionState... interactionStates) {
         for (InteractionState interactionState : interactionStates) {
             for (TaskState taskState : TaskState.values()) {

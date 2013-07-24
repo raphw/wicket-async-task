@@ -2,6 +2,9 @@ package no.kantega.lab.wicket.async.task;
 
 import java.util.concurrent.Future;
 
+/**
+ * A hook into a manager instance. Allows a better reuse of {@link AbstractTaskModel}.
+ */
 public interface ITaskManagerHook {
 
     String getId();

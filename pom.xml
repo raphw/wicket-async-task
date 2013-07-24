@@ -17,7 +17,9 @@
     </organization>
 
     <name>Wicket asynchronous task</name>
-    <description>A web framework based on DOM manipulation.</description>
+    <description>A mini-framework that allows to represent asynchronous tasks in Wicket web applications without
+        breaking the serialization contract.
+    </description>
     <url>http://www.kantega.no</url>
 
     <properties>

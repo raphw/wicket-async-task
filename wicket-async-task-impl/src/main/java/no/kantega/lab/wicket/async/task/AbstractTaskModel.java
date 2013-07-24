@@ -4,6 +4,13 @@ import org.apache.wicket.model.LoadableDetachableModel;
 
 import java.util.concurrent.*;
 
+/**
+ * A model representing a hook into a task manager.
+ * <p/>
+ * <b>Note:</b> Never create a inner class implementation of this class within a custom implementation of
+ * a {@link ITaskManager}. A task manager is in general not serializable and this would therefore break the Wicket
+ * contract of a model.
+ */
 public abstract class AbstractTaskModel extends LoadableDetachableModel<ITaskManagerHook> {
 
     private final String id;
