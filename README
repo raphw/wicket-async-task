@@ -1,1 +1,28 @@
-This is a small extension to Wicket that allows the management of asynchronous tasks and to display their progress to the user.
+This is a small extension to Wicket that allows the management of asynchronous tasks (starting, interrupting and restarting) and to display a task's progress and state to the user. In order to allow tasks to communicate their progress, 
+they have to implement IProgressObservableRunnable which is provided in this package. 
+
+Also, tasks can be managed outside of the scope of a webpage without breaking Wicket's contract that all webpages must be serializable by offering a TaskManager interface. A default implementation of such a task manager is provided.
+
+The extension can be used like this:
+
+public class DemoPage extends WebPage implements IRunnableFactory {
+
+    public DemoPage() {
+
+        Form<?> form = new Form<Void>("form");
+        AbstractTaskModel taskModel = DefaultTaskManager.getInstance().makeModel(1000L, TimeUnit.MINUTES);
+        ProgressButton progressButton = new ProgressButton("button", form, taskModel, this, Duration.milliseconds(500L));
+        ProgressBar progressBar = new ProgressBar("bar", progressButton);
+
+        add(form);
+        form.add(progressButton);
+        form.add(progressBar);
+    }
+
+    @Override
+    public Runnable getRunnable() {
+        return new IProgressObservableRunnable() {
+            // Runnable implementation.
+        };
+    }
+}
