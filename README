@@ -27,3 +27,7 @@ public class DemoPage extends WebPage implements IRunnableFactory {
         };
     }
 }
+
+A demo application is provided in wicket-async-task-demo. The actual implementation can be found wicket-async-task-impl.
+
+Licensed under the Apache Software License, Version 2.0
