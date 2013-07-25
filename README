@@ -1,5 +1,4 @@
-This is a small extension to Wicket that allows the management of asynchronous tasks (starting, interrupting and restarting) and to display a task's progress and state to the user. In order to allow tasks to communicate their progress, 
-they have to implement IProgressObservableRunnable which is provided in this package. 
+This is a small extension to Wicket that allows the management of asynchronous tasks (starting, interrupting and restarting) and to display a task's progress and state to the user. In order to allow tasks to communicate their progress, they have to implement IProgressObservableRunnable which is provided in this package. 
 
 Also, tasks can be managed outside of the scope of a webpage without breaking Wicket's contract that all webpages must be serializable by offering a TaskManager interface. A default implementation of such a task manager is provided.
 
