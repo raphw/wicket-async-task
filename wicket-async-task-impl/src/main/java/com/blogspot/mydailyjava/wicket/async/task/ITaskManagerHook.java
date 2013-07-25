@@ -1,0 +1,17 @@
+package com.blogspot.mydailyjava.wicket.async.task;
+
+import java.util.concurrent.Future;
+
+/**
+ * A hook into a manager instance. Allows a better reuse of {@link AbstractTaskModel}.
+ */
+public interface ITaskManagerHook {
+
+    String getId();
+
+    Future<?> getFuture();
+
+    Runnable getRunnable();
+
+    void submit(Runnable runnable, boolean cancelExistent);
+}

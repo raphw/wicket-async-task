@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>no.kantega.lab.wicket</groupId>
+        <groupId>com.blogspot.mydailyjava</groupId>
         <artifactId>wicket-async-task</artifactId>
         <version>0.1-SNAPSHOT</version>
     </parent>
