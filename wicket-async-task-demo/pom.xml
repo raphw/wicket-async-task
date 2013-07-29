@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.blogspot.mydailyjava</groupId>
         <artifactId>wicket-async-task</artifactId>
-        <version>0.2</version>
+        <version>0.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>wicket-async-task-demo</artifactId>
