@@ -4,7 +4,7 @@
 
     <groupId>com.blogspot.mydailyjava</groupId>
     <artifactId>wicket-async-task</artifactId>
-    <version>0.3-SNAPSHOT</version>
+    <version>0.3</version>
     <packaging>pom</packaging>
 
     <inceptionYear>2013</inceptionYear>
