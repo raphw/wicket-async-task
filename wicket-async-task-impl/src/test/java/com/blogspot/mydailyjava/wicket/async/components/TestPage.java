@@ -1,10 +1,11 @@
 package com.blogspot.mydailyjava.wicket.async.components;
 
-import com.blogspot.mydailyjava.wicket.async.task.AbstractTaskModel;
+import com.blogspot.mydailyjava.wicket.async.task.AbstractTaskContainer;
 import com.blogspot.mydailyjava.wicket.async.task.DefaultTaskManager;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.util.time.Duration;
 
 import java.util.concurrent.TimeUnit;
@@ -21,10 +22,10 @@ public class TestPage extends WebPage implements IRunnableFactory {
 
     public TestPage() {
 
-        AbstractTaskModel model = DefaultTaskManager.getInstance().makeModel(5L, TimeUnit.MINUTES);
+        AbstractTaskContainer taskContainer = DefaultTaskManager.getInstance().makeContainer(5L, TimeUnit.MINUTES);
 
         form = new Form<Void>("form");
-        button = new ProgressButton("button", form, model, this, Duration.milliseconds(300L)) {
+        button = new ProgressButton("button", form, Model.of(taskContainer), this, Duration.milliseconds(300L)) {
             @Override
             protected void onTaskStart(AjaxRequestTarget ajaxRequestTarget) {
                 taskStart = true;

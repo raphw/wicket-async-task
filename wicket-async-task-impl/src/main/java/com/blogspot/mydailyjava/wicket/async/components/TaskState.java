@@ -1,6 +1,6 @@
 package com.blogspot.mydailyjava.wicket.async.components;
 
-import com.blogspot.mydailyjava.wicket.async.task.AbstractTaskModel;
+import com.blogspot.mydailyjava.wicket.async.task.AbstractTaskContainer;
 
 /**
  * Describes the state of a task.
@@ -32,7 +32,7 @@ public enum TaskState {
      */
     CANCELED_NON_RUNNING;
 
-    static TaskState findRunningState(AbstractTaskModel taskModel) {
+    static TaskState findRunningState(AbstractTaskContainer taskModel) {
         if (taskModel.isRunning()) {
             if (taskModel.isCancelled()) {
                 return CANCELED_RUNNING;

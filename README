@@ -9,10 +9,10 @@ public class DemoPage extends WebPage implements IRunnableFactory {
     public DemoPage() {
 
         Form<?> form = new Form<Void>("form");
-        AbstractTaskModel taskModel = DefaultTaskManager.getInstance()
-            .makeModel(1000L, TimeUnit.MINUTES);
+        AbstractTaskContainer taskContainer = DefaultTaskManager.getInstance()
+            .makeContainer(1000L, TimeUnit.MINUTES);
         ProgressButton progressButton = new ProgressButton("button", form, 
-            taskModel, this, Duration.milliseconds(500L));
+            Model.of(taskContainer), this, Duration.milliseconds(500L));
         ProgressBar progressBar = new ProgressBar("bar", progressButton);
 
         add(form);

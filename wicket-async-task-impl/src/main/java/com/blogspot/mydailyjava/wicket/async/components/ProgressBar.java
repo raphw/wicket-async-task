@@ -1,6 +1,6 @@
 package com.blogspot.mydailyjava.wicket.async.components;
 
-import com.blogspot.mydailyjava.wicket.async.task.AbstractTaskModel;
+import com.blogspot.mydailyjava.wicket.async.task.AbstractTaskContainer;
 import org.apache.wicket.Component;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -42,8 +42,8 @@ public class ProgressBar extends Panel {
         this.setOutputMarkupId(true);
     }
 
-    private AbstractTaskModel getTaskModel() {
-        return progressButton.getTaskModel();
+    private AbstractTaskContainer getTaskContainer() {
+        return progressButton.getTaskContainer();
     }
 
     protected WebMarkupContainer makeWrapper(String id) {
@@ -76,14 +76,14 @@ public class ProgressBar extends Panel {
     private class TaskProgressMessageModel extends AbstractReadOnlyModel<String> {
         @Override
         public String getObject() {
-            Double progress = getTaskModel().getProgress();
+            Double progress = getTaskContainer().getProgress();
             String suffix = "";
             if (isShowPercentage()) {
                 if (progress != null) {
                     suffix = String.format("(%d%%)", getPercentProgress());
                 }
             }
-            String message = getTaskModel().getProgressMessage();
+            String message = getTaskContainer().getProgressMessage();
             if (message == null) {
                 message = "";
             }
@@ -100,7 +100,7 @@ public class ProgressBar extends Panel {
     }
 
     private int getPercentProgress() {
-        double width = getTaskModel().getProgress() == null ? getDefaultWidth() : getTaskModel().getProgress();
+        double width = getTaskContainer().getProgress() == null ? getDefaultWidth() : getTaskContainer().getProgress();
         return (int) Math.round(Math.max(Math.min(width, 1d), 0d) * 100d);
     }
 
