@@ -42,10 +42,12 @@ public class DemoPage extends WebPage implements IRunnableFactory {
     @Override
     public Runnable getRunnable() {
         return new IProgressObservableRunnable() {
-            // This class keeps an implicit reference to its containing WebPage 
-            // The page might be in an detached state when the inner class tries to access it.
-            // Also, this will cause a memory leak to you application since this instance can not
-            // be garbage collected as long as this task did not expire.
+            // This class keeps an implicit reference to its 
+            // containing WebPage. The page might be in a 
+            // detached state when the inner class tries to access it.
+            // Also, this will cause a memory leak to you application 
+            // since this instance can not be garbage collected as 
+            // long as this task did not expire.
         }
     }
 }
@@ -63,6 +65,9 @@ public class DemoPage extends WebPage implements IRunnableFactory {
             
                 @Override
                 protected void onTaskError(AjaxRequestTarget ajaxRequestTarget) {
+                    // This method is always executed from the GUI thread.
+                    // Therefore, it is safe to poll the possible exception
+                    // from the background thread.
                     Throwable th = getTaskContainer().getExecutionError();
                     if (th != null) {
                         error(th.getLocalizedMessage()));
