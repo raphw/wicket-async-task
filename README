@@ -22,12 +22,59 @@ public class DemoPage extends WebPage implements IRunnableFactory {
 
     @Override
     public Runnable getRunnable() {
-        return new IProgressObservableRunnable() {
-            // Runnable implementation.
-        };
+        return new MyRunnable();
+    }
+    
+    private static class MyRunnable implements IProgressObservableRunnable {
+        // Implementation of a Runnable with observable progress
+        ...
     }
 }
 
 A demo application is provided in wicket-async-task-demo. The actual implementation can be found wicket-async-task-impl.
+
+Important note: Do not implement Runnables as (anonymous) inner classes of a Wicket class. These classes are expected to be detached and serialized by the Wicket framework. Therfore, do not attemt the following:
+
+public class DemoPage extends WebPage implements IRunnableFactory {
+    
+    ...
+
+    @Override
+    public Runnable getRunnable() {
+        return new IProgressObservableRunnable() {
+            // This class keeps an implicit reference to its containing WebPage 
+            // The page might be in an detached state when the inner class tries to access it.
+            // Also, this will cause a memory leak to you application since this instance can not
+            // be garbage collected as long as this task did not expire.
+        }
+    }
+}
+
+In addition, do not attempt to call Wicket methods from the background task. If you for example want to transform exceptions in background threads into Wicket error messages, this would be what you want to do:
+
+public class DemoPage extends WebPage implements IRunnableFactory {
+
+    public DemoPage() {
+
+        ...
+        
+        ProgressButton progressButton = new ProgressButton("button", form, 
+            Model.of(taskContainer), this, Duration.milliseconds(500L)) {
+            
+                @Override
+                protected void onTaskError(AjaxRequestTarget ajaxRequestTarget) {
+                    Throwable th = getTaskContainer().getExecutionError();
+                    if (th != null) {
+                        error(th.getLocalizedMessage()));
+                    }
+                }
+                
+        }
+    }
+    
+    ...
+}
+
+As long as you keep your background tasks free from references to your Wicket classes, you are safe.
 
 Licensed under the Apache Software License, Version 2.0
