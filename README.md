@@ -91,3 +91,5 @@ As long as you keep your background tasks free from references to your Wicket cl
 * Using *@SpringBean* annotated variables: Those Spring beans are actually bound to the application and implemented as proxies. Instead, use `WebApplication.get().getServletContext()` in order to find the beans directly by `WebApplicationContextUtils.getWebApplicationContext(servletContext).getBean(MyBean.class)`
 
 Licensed under the Apache Software License, Version 2.0
+
+[![Build Status](https://travis-ci.org/raphw/wicket-async-task.png)](https://travis-ci.org/raphw/wicket-async-task)
