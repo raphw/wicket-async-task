@@ -65,6 +65,10 @@ public class ProgressButton extends AjaxFallbackButton {
         this.add(new AttributeAppender("class", new StateDispatcherModel<String>(new Model<String>(), stateCssClasses), " "));
 
         this.setOutputMarkupId(true);
+        
+        if (getTaskContainer().isRunning()) {
++         add(refreshBehavior);
++       }
     }
 
     private IModel<String> getDefaultTextModel(IModel<String> userModel) {
