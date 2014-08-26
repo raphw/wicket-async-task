@@ -67,8 +67,8 @@ public class ProgressButton extends AjaxFallbackButton {
         this.setOutputMarkupId(true);
         
         if (getTaskContainer().isRunning()) {
-+         add(refreshBehavior);
-+       }
+          add(refreshBehavior);
+        }
     }
 
     private IModel<String> getDefaultTextModel(IModel<String> userModel) {
