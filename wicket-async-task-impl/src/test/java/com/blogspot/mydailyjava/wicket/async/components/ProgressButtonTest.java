@@ -113,8 +113,8 @@ public class ProgressButtonTest {
         assertTrue(page.isTaskError());
     }
 
-    private void executeRefresh(long deplay) throws Exception {
-        Thread.sleep(deplay);
+    private void executeRefresh(long delay) throws Exception {
+        Thread.sleep(delay);
         for (Behavior b : page.getButton().getBehaviors()) {
             if (b instanceof AbstractAjaxTimerBehavior) {
                 tester.executeBehavior((AbstractAjaxTimerBehavior) b);

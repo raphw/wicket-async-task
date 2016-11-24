@@ -13,11 +13,11 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.util.time.Duration;
 
-import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * A progress button which allows to control a {@link Runnable}. Each such button will refresh itself as given by
@@ -131,24 +131,24 @@ public class ProgressButton extends AjaxFallbackButton {
     }
 
     @Override
-    protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
-        super.onSubmit(target, form);
+    protected void onSubmit(Optional<AjaxRequestTarget> target) {
+        super.onSubmit(target);
 
         if (canStart() || canRestart()) {
             getTaskContainer().submit(runnableFactory.getRunnable());
-            onTaskStart(target);
+            onTaskStart(target.orElse(null));
         } else if (canInterrupt()) {
             getTaskContainer().cancel();
         } else {
             return;
         }
 
-        if (target != null) {
-            activateRefresh(target);
-            renderAll(target);
-        }
+        target.ifPresent(t -> {
+            activateRefresh(t);
+            renderAll(t);
+        });
 
-        concludeIfApplicable(target);
+        concludeIfApplicable(target.orElse(null));
     }
 
     private void activateRefresh(AjaxRequestTarget target) {
@@ -208,12 +208,6 @@ public class ProgressButton extends AjaxFallbackButton {
         @Override
         protected void onTimer(AjaxRequestTarget target) {
             refresh(target);
-        }
-
-        @Override
-        public boolean canCallListenerInterface(Component component, Method method) {
-            // Skip check for the component being enabled
-            return component.isVisibleInHierarchy();
         }
 
         @Override
