@@ -8,7 +8,6 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.util.time.Duration;
@@ -299,7 +298,7 @@ public class ProgressButton extends AjaxFallbackButton {
         }
     }
 
-    class StateDispatcherModel<T> extends AbstractReadOnlyModel<T> {
+    class StateDispatcherModel<T> implements IModel<T> {
 
         private final IModel<T> defaultValue;
 

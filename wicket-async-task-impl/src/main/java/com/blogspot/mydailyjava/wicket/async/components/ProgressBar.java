@@ -6,7 +6,6 @@ import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 
@@ -73,7 +72,7 @@ public class ProgressBar extends Panel {
         return 0d;
     }
 
-    private class TaskProgressMessageModel extends AbstractReadOnlyModel<String> {
+    private class TaskProgressMessageModel implements IModel<String> {
         @Override
         public String getObject() {
             Double progress = getTaskContainer().getProgress();
@@ -91,7 +90,7 @@ public class ProgressBar extends Panel {
         }
     }
 
-    private class TaskProgressPercentageStyleModel extends AbstractReadOnlyModel<String> {
+    private class TaskProgressPercentageStyleModel implements IModel<String> {
         @Override
         public String getObject() {
             int percentProgress = getPercentProgress();
