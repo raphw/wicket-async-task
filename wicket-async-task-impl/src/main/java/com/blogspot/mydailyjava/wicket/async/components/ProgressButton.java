@@ -151,11 +151,7 @@ public class ProgressButton extends AjaxFallbackButton {
     }
 
     private void activateRefresh(AjaxRequestTarget target) {
-        if (!getTaskContainer().isRunning()) {
-            if (getBehaviors(RefreshBehavior.class).size() > 0) {
-                refreshBehavior.stop(target);
-            }
-        } else if (getBehaviors(RefreshBehavior.class).size() == 0) {
+        if (getBehaviors(RefreshBehavior.class).size() == 0) {
             add(refreshBehavior);
         } else {
             refreshBehavior.restart(target);
@@ -174,7 +170,7 @@ public class ProgressButton extends AjaxFallbackButton {
 
     private void concludeIfApplicable(AjaxRequestTarget target) {
         if (!getTaskContainer().isRunning()) {
-            if (target != null) {
+            if (target != null && !refreshBehavior.isStopped()) {
                 refreshBehavior.stop(target);
             }
             if (getTaskContainer().isFailed()) {
